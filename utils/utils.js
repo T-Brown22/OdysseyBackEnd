@@ -8,7 +8,7 @@ let db = require('utils/sql_conn');
 var nodemailer = require('nodemailer');
 
 //Use this to create SHA256 hash
-const crypto = require("crypto");
+const crypto = require('crypto');
 
 /**
  * Sends an email to a user
