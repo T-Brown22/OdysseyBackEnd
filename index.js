@@ -1,129 +1,54 @@
-/**
- * Entry point for backend to add user's mental health data to a webserver
- */
-
-// express is the framework we use to handle requests
+//express is the framework we're going to use to handle requests
 const express = require('express');
-
-//we use this to create the SHA256 hash
-const crypto = require('crypto');
-
-//crate connection to the Heroku DB
-let db = require('utils/utils').db;
-
-//
-let getHash = require('utils/utils').getHash;
-
-//a list of predefined queries
-let queries = require('utils/queries');
-
-var router = express.Router();
-
-const bodyParser = require('body-parser');
-
-//constant vars for JSON vars
-let JSONconsts = require('utils/JSON_defs')
-
-/**
- * Endpoint for adding new data
- */
-
+//Create a new instance of express
 const app = express();
 
+const bodyParser = require("body-parser");
+//This allows parsing of the body of POST requests, that are encoded in JSON
+app.use(bodyParser.json());
+
+//pg-promise is a postgres library that uses javascript promises
+const pgp = require('pg-promise')();
+//We have to set ssl usage to true for Heroku to accept our connection
+pgp.pg.defaults.ssl = true;
+
+//Create connection to Heroku Database
+let db = pgp( process.env.DATABASE_URL);
+
+if(!db) {
+   console.log("SHAME! Follow the intructions and set your DATABASE_URL correctly");
+   process.exit(1);
+}
+
+
+
+
 
 /*
-    Home Page
-
-    www.[website].com/
+ * Return HTML for the / end point. 
+ * This is a nice location to document your web service API
+ * Create a web page in HTML/CSS and have this end point return it. 
+ * Look up the node module 'fs' ex: require('fs');
  */
-app.get("/", (req,res) => {
+app.get("/", (req, res) => {
     res.writeHead(200, {'Content-Type': 'text/html'});
-    //write response to the client
-    res.write('<h1 style="color:blue">Hello World!</h1>');
-    res.end();//end the response
+    for (i = 1; i < 7; i++) {
+        //write a response to the client
+        res.write('<h' + i + ' style="color:green">Hello World!</h' + i + '>');
+    }
+    res.end(); //end the response
 });
 
-
-/*
-    Adding Research Data
-
-    www.[website].com/addAnonEpisodeBioData
- */
-router.post('/addData', (req, res) => {
-    res.type("application/json");
-
-    //retrieve data from query params
-    let episodeId = req.body[JSONconsts.EPISODE_ID];
-    let start = req.body[JSONconsts.START_DATE];
-    let end = req.body[JSONconsts.END_DATE];
-    let dur = req.body[JSONconsts.DURATION];
-    let interval = req.body[JSONconsts.INTERVAL];
-    let steps = req.body[JSONconsts.STEPS];
-    let hrData = req.body[JSONconsts.HEARTRATE_DATA];
-    let soundData = req.body[JSONconsts.SOUND_DATA];
-    let diagnosis = req.body[JSONconsts.DIAGNOSIS];
-    let avgRestHR = req.body[JSONconsts.RESTING_HR];
-    let avgWalkHR = req.body[JSONconsts.WALKING_HR];
-    let recentHRV = req.body[JSONconsts.RECENT_HRV];
-    let userID = req.body[JSONconsts.USER_ID];
-    let age = req.body[JSONconsts.AGE]
-
-
-
-    let params = [episodeId, start, end, dur, interval, hrData, soundData, avgRestHR, avgWalkHR, steps, recentHRV, userID, diagnosis, age]
-
-    //verify each of the params
-    var isValidParams = true
-
-    for (const element of params) {
-        if(!element){
-            isValidParams = false
-        }
-    }
-
-    for (let index = 0; index < params.length; index++){
-        if(params[index]){
-            isValidParams = false
-        }
-    }
-
-    params.forEach(element => {
-        if (!element) {
-            isValidParams = false
-        }
-    });
-
-    if (!isValidParams) {
-        res.send({
-            success: false,
-            input: req.body,
-            error: "Missing required info"
-        })
-    } else {
-
-        db.none(queries.INSERT_EPISODE_DATA, params)
-            .then(() => {
-                //successfully added, let the user know
-                res.send({
-                    success: true
-                });
-                //do other stuff with data
-            }).catch((error) => {
-            console.log(error);
-
-            res.send({
-                success: false,
-                error: error
-            });
-        });
-    }
-})
-
-
-
-//Assign a port you can use vio the 'PORT' env var
+/* 
+* Heroku will assign a port you can use via the 'PORT' environment variable
+* To accesss an environment variable, use process.env.<ENV>
+* If there isn't an environment variable, process.env.PORT will be null (or undefined)
+* If a value is 'falsy', i.e. null or undefined, javascript will evaluate the rest of the 'or'
+* In this case, we assign the port to be 5000 if the PORT variable isn't set
+* You can consider 'let port = process.env.PORT || 5000' to be equivalent to:
+* let port; = process.env.PORT;
+* if(port == null) {port = 5000} 
+*/ 
 app.listen(process.env.PORT || 5000, () => {
-   console.log("Server up and running on port: " + (process.env.PORT || 5000));
+    console.log("Server up and running on port: " + (process.env.PORT || 5000));
 });
-
-
