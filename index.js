@@ -13,11 +13,11 @@ const pgp = require('pg-promise')();
 pgp.pg.defaults.ssl = true;
 
 //Create connection to Heroku Database
-let db = pgp( process.env.DATABASE_URL);
+const db = pgp(process.env.DATABASE_URL);
 
 if(!db) {
-   console.log("SHAME! Follow the intructions and set your DATABASE_URL correctly");
-   process.exit(1);
+    console.log("SHAME! Follow the instructions and set your DATABASE_URL correctly");
+    process.exit(1);
 }
 
 
@@ -32,10 +32,8 @@ if(!db) {
  */
 app.get("/", (req, res) => {
     res.writeHead(200, {'Content-Type': 'text/html'});
-    for (i = 1; i < 7; i++) {
-        //write a response to the client
-        res.write('<h' + i + ' style="color:green">Hello World!</h' + i + '>');
-    }
+   //write a response to the client
+    res.write('<h' + 1 + ' style="color:blue">APP IS ONLINE</h' + 1 + '>');
     res.end(); //end the response
 });
 
