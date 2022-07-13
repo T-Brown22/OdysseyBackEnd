@@ -11,10 +11,11 @@
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.18.2",
+    "dotenv": "^16.0.1",
     "express": "^4.16.2",
     "form-data": "^2.3.2",
     "mysql": "^2.15.0",
-    "npm": "^5.7.1",
+    "npm": "^8.11.0",
     "pg": "^7.4.1",
     "pg-promise": "^8.1.1",
     "request": "^2.88.0"
