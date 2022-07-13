@@ -7,16 +7,10 @@ const app = express();
 
 
 
-const bodyParser = require("body-parser");
+//const bodyParser = require("body-parser");
 //This allows parsing of the body of POST requests, that are encoded in JSON
-app.use(bodyParser.json());
-
-//pg-promise is a postgres library that uses javascript promises
-//const pgp = require('pg-promise')();
-//We have to set ssl usage to true for Heroku to accept our connection
-//pgp.pg.defaults.ssl = true;
-
-
+//app.use(bodyParser.json());
+app.use('/add', require('./routes/add.js'));
 
 //Create connection to Heroku Database
 let db = require('./util/sql_conn');
